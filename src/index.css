@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Dark mode (default) */
+  body {
+    @apply bg-zinc-950 text-zinc-100 font-sans antialiased;
+  }
+
+  /* Light mode */
+  html:not(.dark) body {
+    @apply bg-slate-100 text-zinc-900;
+  }
+
+  /* Custom scrollbar - dark */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { @apply bg-transparent; }
+  ::-webkit-scrollbar-thumb { @apply rounded-full bg-zinc-700; }
+  html:not(.dark) ::-webkit-scrollbar-thumb { @apply bg-zinc-300; }
+}
+
+@layer utilities {
+  /* Shimmer animation for skeleton loading */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      theme('colors.zinc.800') 25%,
+      theme('colors.zinc.700') 50%,
+      theme('colors.zinc.800') 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  html:not(.dark) .shimmer {
+    background: linear-gradient(
+      90deg,
+      theme('colors.zinc.200') 25%,
+      theme('colors.zinc.100') 50%,
+      theme('colors.zinc.200') 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

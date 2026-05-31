@@ -6,7 +6,7 @@ A production-grade cryptocurrency tracking application built with **React 18**, 
 
 ## 🚀 Live Demo
 
-> Deploy your own instance — see [Deployment](#deployment) section below.
+> Deploy your own instance — see [Deployment](https://crypto-prices-tracker.vercel.app) section below.
 
 ---
 

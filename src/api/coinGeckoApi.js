@@ -1,9 +1,19 @@
 import axios from "axios";
 
-// All requests go through the Vite proxy (/api → coingecko.com/api/v3)
-// This avoids CORS and attaches the API key via vite.config.js
+/*
+ * Environment-aware base URL:
+ * - Local dev  → "/api" routes through Vite proxy (avoids CORS)
+ * - Production → direct CoinGecko URL with API key in header
+ */
+const isProduction = import.meta.env.PROD;
+
 const client = axios.create({
-  baseURL: "/api",
+  baseURL: isProduction
+    ? import.meta.env.VITE_COINGECKO_BASE
+    : "/api",
+  headers: isProduction && import.meta.env.VITE_COINGECKO_KEY
+    ? { "x-cg-demo-api-key": import.meta.env.VITE_COINGECKO_KEY }
+    : {},
 });
 
 /**

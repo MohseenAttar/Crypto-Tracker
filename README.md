@@ -6,14 +6,14 @@ A production-grade cryptocurrency tracking application built with **React 18**, 
 
 ## 🚀 Live Demo
 
-> Deploy your own instance — see [Deployment](https://crypto-prices-tracker.vercel.app) section below.
+🔗 **[https://crypto-prices-tracker.vercel.app](https://crypto-prices-tracker.vercel.app)**
 
 ---
 
 ## ✨ Features
 
 ### 🏠 Market Page
-- Live prices for top coins, updating every **60 seconds**
+- Live prices for top coins updating every **60 seconds**
 - Sortable table — rank, price, 1h%, 24h%, 7d%, market cap, sparkline
 - **Gainers / Losers** filter across top 250 coins
 - Search by coin name or symbol with debounce
@@ -21,7 +21,7 @@ A production-grade cryptocurrency tracking application built with **React 18**, 
 - Fully responsive with horizontal scroll on mobile
 
 ### 🔍 Coin Detail Page
-- Interactive price history chart — **1D / 7D / 1M / 3M / 1Y** range selector
+- Interactive price history chart with **1D / 7D / 1M / 3M / 1Y** range selector
 - Key statistics — ATH, ATL, circulating supply, fully diluted valuation, 24h high/low
 - Quick overview sidebar — rank, volume, percentage changes
 - Official links — website, explorer, Reddit, Twitter, GitHub
@@ -37,7 +37,7 @@ A production-grade cryptocurrency tracking application built with **React 18**, 
 ### 💼 Portfolio
 - **Live search** across 13,000+ coins via CoinGecko search API
 - Real-time P&L per coin and total portfolio value
-- Allocation **donut chart** (Recharts)
+- Allocation **donut chart**
 - Inline quantity editing — click to edit, Enter to save, Escape to cancel
 - Remove with confirmation modal
 - Persisted via `useReducer` + `localStorage`
@@ -66,51 +66,55 @@ A production-grade cryptocurrency tracking application built with **React 18**, 
 ## 🏗️ Architecture Highlights
 
 - **Hybrid pagination** — server-side for the "All" view (unlimited coins), client-side for Gainers/Losers (top 250 fetched once)
+- **Vercel serverless proxy** — all API requests route through `api/proxy.js` in production, keeping the API key server-side and solving CORS completely
 - **Optimistic cache merging** — adding a coin to watchlist/portfolio uses `queryClient.setQueryData()` to merge data without triggering a loading state
-- **Derived state pattern** — display lists are always derived from local context (WatchlistContext, PortfolioContext), never from stale API cache. Removals are instant
-- **Stable query keys** — React Query cache is never invalidated on add/remove, only on explicit refresh
-- **React.memo with custom comparator** — `CoinRow` only re-renders when its price-relevant data changes, not on every parent render
+- **Derived state pattern** — display lists always derived from local context, never from stale API cache — removals are instant
+- **Stable query keys** — React Query cache never invalidated on add/remove, only on explicit refresh
+- **React.memo with custom comparator** — `CoinRow` only re-renders when price-relevant data changes
 - **Error Boundary** — catches runtime errors and shows a fallback UI instead of crashing the whole app
-- **Vite proxy** — all API requests route through the Vite dev server, attaching the API key server-side and avoiding CORS issues
 
 ---
 
 ## 📁 Folder Structure
 
 ```
-src/
 ├── api/
-│   └── coinGeckoApi.js         # All Axios API calls in one place
-├── components/
-│   ├── crypto/                 # Domain-specific components
-│   │   ├── CoinTable.jsx
-│   │   ├── CoinRow.jsx
-│   │   ├── PriceHistoryChart.jsx
-│   │   ├── PortfolioTable.jsx
-│   │   ├── AllocationChart.jsx
-│   │   └── ...
-│   ├── layout/                 # Navbar, Footer, PageHeader
-│   └── ui/                     # Reusable UI — Modal, SearchBar, PriceChange, etc.
-├── context/
-│   ├── ThemeContext.jsx         # Dark / light mode
-│   ├── CurrencyContext.jsx      # USD / EUR / INR toggle
-│   ├── WatchlistContext.jsx     # Starred coins (localStorage)
-│   └── PortfolioContext.jsx     # Portfolio state (useReducer + localStorage)
-├── hooks/
-│   ├── useCoinMarkets.js        # Live market table data
-│   ├── useTopCoins.js           # Top 250 for Gainers/Losers filter
-│   ├── useCoinSearch.js         # Live coin search for portfolio modal
-│   ├── useWatchlistCoins.js     # Watchlist prices by coin IDs
-│   ├── usePortfolioCoins.js     # Portfolio prices by coin IDs
-│   ├── usePortfolioStats.js     # Pure P&L computation hook
-│   └── useDebounce.js
-├── pages/
-│   ├── Home.jsx
-│   ├── CoinDetail.jsx
-│   ├── Watchlist.jsx
-│   └── Portfolio.jsx
-└── utils/
-    └── formatCurrency.js        # formatPrice, formatMarketCap, formatPct
+│   └── proxy.js                # Vercel serverless proxy — keeps API key server-side
+├── src/
+│   ├── api/
+│   │   └── coinGeckoApi.js     # All Axios API calls in one place
+│   ├── components/
+│   │   ├── crypto/             # Domain-specific components
+│   │   │   ├── CoinTable.jsx
+│   │   │   ├── CoinRow.jsx
+│   │   │   ├── PriceHistoryChart.jsx
+│   │   │   ├── PortfolioTable.jsx
+│   │   │   ├── AllocationChart.jsx
+│   │   │   └── ...
+│   │   ├── layout/             # Navbar, Footer, PageHeader
+│   │   └── ui/                 # Reusable UI — Modal, SearchBar, PriceChange, etc.
+│   ├── context/
+│   │   ├── ThemeContext.jsx     # Dark / light mode
+│   │   ├── CurrencyContext.jsx  # USD / EUR / INR toggle
+│   │   ├── WatchlistContext.jsx # Starred coins (localStorage)
+│   │   └── PortfolioContext.jsx # Portfolio state (useReducer + localStorage)
+│   ├── hooks/
+│   │   ├── useCoinMarkets.js    # Live market table data
+│   │   ├── useTopCoins.js       # Top 250 for Gainers/Losers filter
+│   │   ├── useCoinSearch.js     # Live coin search for portfolio modal
+│   │   ├── useWatchlistCoins.js # Watchlist prices by coin IDs
+│   │   ├── usePortfolioCoins.js # Portfolio prices by coin IDs
+│   │   ├── usePortfolioStats.js # Pure P&L computation hook
+│   │   └── useDebounce.js
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   ├── CoinDetail.jsx
+│   │   ├── Watchlist.jsx
+│   │   └── Portfolio.jsx
+│   └── utils/
+│       └── formatCurrency.js    # formatPrice, formatMarketCap, formatPct
+├── vercel.json                  # SPA rewrites + serverless function config
+└── vite.config.js               # Dev proxy config
 ```
 
 ---
@@ -126,8 +130,8 @@ src/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/crypto-tracker.git
-cd crypto-tracker
+git clone https://github.com/MohseenAttar/Crypto-Tracker.git
+cd Crypto-Tracker
 
 # 2. Install dependencies
 npm install
@@ -176,7 +180,7 @@ VITE_COINGECKO_KEY  = CG-your-api-key-here
 
 5. Click **Deploy** ✓
 
-> **Note:** The Vite proxy (`vite.config.js`) only works in development. In production (Vercel), requests go directly from the browser to CoinGecko with the API key attached via the request header. Make sure your CoinGecko key is set in Vercel environment variables.
+> **How it works in production:** All API requests route through the Vercel serverless function at `api/proxy.js`. The API key is injected server-side — it's never exposed to the browser. This solves both CORS and API key security in one step.
 
 ---
 

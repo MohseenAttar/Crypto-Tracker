@@ -2,23 +2,22 @@ import axios from "axios";
 
 /*
  * Environment-aware base URL:
- * - Local dev  → "/api" routes through Vite proxy (avoids CORS)
- * - Production → direct CoinGecko URL with API key in header
+ *
+ * Local dev  → "/api"        routes through Vite proxy → CoinGecko
+ *                             (key injected server-side via vite.config.js)
+ *
+ * Production → "/coingecko"  routes through Vercel serverless function
+ *                             (api/proxy.js injects key server-side)
+ *
+ * Both approaches keep the API key off the browser entirely.
  */
-const isProduction = import.meta.env.PROD;
-
 const client = axios.create({
-  baseURL: isProduction
-    ? import.meta.env.VITE_COINGECKO_BASE
-    : "/api",
-  headers: isProduction && import.meta.env.VITE_COINGECKO_KEY
-    ? { "x-cg-demo-api-key": import.meta.env.VITE_COINGECKO_KEY }
-    : {},
+  baseURL: import.meta.env.PROD ? "/coingecko" : "/api",
 });
 
 /**
  * Home page — "All" filter mode.
- * Server-side pagination — fetches exactly what's visible (20 per page).
+ * Server-side pagination — 20 coins per page.
  * Allows browsing all 13,000+ CoinGecko coins.
  */
 export const fetchCoinMarkets = async (currency = "usd", page = 1) => {
@@ -37,8 +36,7 @@ export const fetchCoinMarkets = async (currency = "usd", page = 1) => {
 
 /**
  * Home page — Gainers/Losers filter mode.
- * Fetches top 250 once — enough for meaningful filter results.
- * Client-side filter + pagination applied on top.
+ * Fetches top 250 once, client-side filter + pagination on top.
  */
 export const fetchTopCoins = async (currency = "usd") => {
   const res = await client.get("/coins/markets", {
@@ -56,17 +54,17 @@ export const fetchTopCoins = async (currency = "usd") => {
 
 /**
  * AddCoinModal — live search across all 13,000+ coins.
- * Uses CoinGecko /search endpoint — returns coins matching the query.
- * Then fetches market data (price, image) for matched coin IDs.
  */
 export const searchCoins = async (query) => {
   const res = await client.get("/search", {
     params: { query },
   });
-  // Returns { coins: [{ id, name, symbol, thumb, market_cap_rank }] }
-  return res.data.coins.slice(0, 20); // top 20 search results
+  return res.data.coins.slice(0, 20);
 };
 
+/**
+ * Fetch specific coins by IDs — used by Watchlist.
+ */
 export const fetchCoinsByIds = async (ids, currency = "usd") => {
   const res = await client.get("/coins/markets", {
     params: {
@@ -101,6 +99,9 @@ export const fetchCoinDetail = async (id) => {
   return res.data;
 };
 
+/**
+ * Lightweight price fetch for Portfolio — no sparkline.
+ */
 export const fetchPricesByIds = async (ids, currency = "usd") => {
   const res = await client.get("/coins/markets", {
     params: {

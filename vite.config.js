@@ -9,9 +9,9 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         "/api": {
-          target: "https://api.coingecko.com",
+          target: "https://api.coingecko.com/api/v3",
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, "/api/v3"),
+          rewrite: (path) => path.replace(/^\/api/, ""),
           configure: (proxy) => {
             proxy.on("proxyReq", (proxyReq) => {
               if (env.VITE_COINGECKO_KEY) {
